@@ -1,0 +1,226 @@
+# Copyright IBM Corp. All Rights Reserved.
+
+Organizations:
+
+    - &OrdererOrg
+
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: ../organizations/ordererOrganizations/ntuc.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+
+        OrdererEndpoints:
+            - orderer.ntuc.com:7050
+
+    - &tradeunion
+        Name: Org1MSP
+        ID: Org1MSP
+
+        MSPDir: ../organizations/peerOrganizations/tradeunion.ntuc.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Org1MSP.admin', 'Org1MSP.peer', 'Org1MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Org1MSP.admin', 'Org1MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Org1MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Org1MSP.peer')"
+
+        AnchorPeers:
+            - Host: peer0.tradeunion.ntuc.com
+              Port: 7051
+
+    - &tradeassociation
+        Name: Org2MSP
+        ID: Org2MSP
+
+        MSPDir: ../organizations/peerOrganizations/tradeassociation.ntuc.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Org2MSP.admin', 'Org2MSP.peer', 'Org2MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Org2MSP.admin', 'Org2MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Org2MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Org2MSP.peer')"
+
+        AnchorPeers:
+            - Host: peer0.tradeassociation.ntuc.com
+              Port: 9051
+
+    - &socialenterprise
+        Name: Org3MSP
+        ID: Org3MSP
+
+        MSPDir: ../organizations/peerOrganizations/socialenterprise.ntuc.com/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('Org3MSP.admin', 'Org3MSP.peer', 'Org3MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('Org3MSP.admin', 'Org3MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('Org3MSP.admin')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('Org3MSP.peer')"
+
+        AnchorPeers:
+            - Host: peer0.socialenterprise.ntuc.com
+              Port: 11051
+################################################################################
+#   SECTION: Capabilities
+################################################################################
+Capabilities:
+    Channel: &ChannelCapabilities
+        V2_0: true
+    Orderer: &OrdererCapabilities
+        V2_0: true
+    Application: &ApplicationCapabilities
+        V2_0: true
+
+################################################################################
+#   SECTION: Application
+################################################################################
+Application: &ApplicationDefaults
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+################################################################################
+#   SECTION: Orderer
+################################################################################
+Orderer: &OrdererDefaults
+
+    # Orderer Type: The orderer implementation to start
+    OrdererType: etcdraft
+
+    EtcdRaft:
+        Consenters:
+        - Host: orderer.ntuc.com
+          Port: 7050
+          ClientTLSCert: ../organizations/ordererOrganizations/ntuc.com/orderers/orderer.ntuc.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/ntuc.com/orderers/orderer.ntuc.com/tls/server.crt
+        - Host: orderer2.ntuc.com
+          Port: 7050
+          ClientTLSCert: ../organizations/ordererOrganizations/ntuc.com/orderers/orderer2.ntuc.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/ntuc.com/orderers/orderer2.ntuc.com/tls/server.crt
+        - Host: orderer3.ntuc.com
+          Port: 7050
+          ClientTLSCert: ../organizations/ordererOrganizations/ntuc.com/orderers/orderer3.ntuc.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/ntuc.com/orderers/orderer3.ntuc.com/tls/server.crt
+        - Host: orderer4.ntuc.com
+          Port: 7050
+          ClientTLSCert: ../organizations/ordererOrganizations/ntuc.com/orderers/orderer4.ntuc.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/ntuc.com/orderers/orderer4.ntuc.com/tls/server.crt
+        - Host: orderer5.ntuc.com
+          Port: 7050
+          ClientTLSCert: ../organizations/ordererOrganizations/ntuc.com/orderers/orderer5.ntuc.com/tls/server.crt
+          ServerTLSCert: ../organizations/ordererOrganizations/ntuc.com/orderers/orderer5.ntuc.com/tls/server.crt
+
+
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+################################################################################
+#   CHANNEL
+################################################################################
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ChannelCapabilities
+
+################################################################################
+#   Profile
+################################################################################
+Profiles:
+
+    ThreeOrgsOrdererGenesis:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *tradeunion
+                    - *tradeassociation
+                    - *socialenterprise
+    ThreeOrgsChannel:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *tradeunion
+                - *tradeassociation
+                - *socialenterprise
+            Capabilities:
+                <<: *ApplicationCapabilities
